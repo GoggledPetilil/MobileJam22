@@ -5,28 +5,34 @@ using UnityEngine;
 public class BowlingBall : MonoBehaviour
 {
     [Header("Parameters")]
+    public float m_Power;
     public float m_Speed;
+    private Vector3 m_currentSpeed;
 
     [Header("Components")]
     [SerializeField] private Rigidbody m_rb;
 
-    void Awake()
-    {
-        m_rb = GetComponent<Rigidbody>();
-    }
-
     void Start()
     {
-        
+        RollBall();
     }
 
     void Update()
     {
-        
+        // This is to prevent the bowling ball from losing
+        // speed when colliding against the pins.
+        if(m_currentSpeed.z < m_rb.velocity.z)
+        {
+            m_currentSpeed = m_rb.velocity;
+        }
+        else if(m_currentSpeed.z > m_rb.velocity.z)
+        {
+            m_rb.velocity = m_currentSpeed;
+        }
     }
 
-    void FixedUpdate()
+    void RollBall()
     {
-        m_rb.velocity = new Vector3(m_rb.velocity.x, m_rb.velocity.y, 1.0f) * m_Speed;
+        m_rb.AddForce(Vector3.forward * m_Speed * m_Power);
     }
 }
