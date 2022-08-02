@@ -4,8 +4,29 @@ using UnityEngine;
 
 public class BowlingPin : MonoBehaviour
 {
+    [Header("Parameters")]
+    public bool m_beenHit;
+    [SerializeField] private Vector3 m_com;
+
+    [Header("Components")]
     [SerializeField] private AudioSource m_audio;
-    private bool m_beenHit;
+    [SerializeField] private Rigidbody m_rb;
+
+    void Awake()
+    {
+        m_audio = GetComponent<AudioSource>();
+        m_rb = GetComponent<Rigidbody>();
+    }
+
+    void Start()
+    {
+        m_rb.centerOfMass = m_com;
+    }
+
+    void Update()
+    {
+        if(!m_beenHit) return;
+    }
 
     void PlayHitSound()
     {
@@ -19,6 +40,11 @@ public class BowlingPin : MonoBehaviour
         if(collision.gameObject.CompareTag("BowlingBall"))
         {
             PlayHitSound();
+
+            float force = collision.gameObject.GetComponent<BowlingBall>().m_Power;
+            Vector3 dir = (this.transform.position - collision.gameObject.transform.position).normalized;
+            m_rb.AddForce(dir * force, ForceMode.Impulse);
+            m_rb.centerOfMass = Vector3.zero;
         }
     }
 }
