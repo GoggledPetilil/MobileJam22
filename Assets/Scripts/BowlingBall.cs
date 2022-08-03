@@ -12,11 +12,17 @@ public class BowlingBall : MonoBehaviour
 
     [Header("Components")]
     [SerializeField] private Rigidbody m_rb;
+    [SerializeField] private Collider m_col;
+
+    void Awake()
+    {
+        m_col = this.GetComponent<Collider>();
+    }
 
     void Start()
     {
-        
-        RollBall();
+        m_currentHeight = transform.position.y;
+        EnablePhysics(false);
     }
 
     void Update()
@@ -25,7 +31,7 @@ public class BowlingBall : MonoBehaviour
         // having it's Y axis go higher.
         if(m_currentHeight > transform.position.y)
         {
-            m_currentSpeed = transform.position.y;
+            m_currentHeight = transform.position.y;
         }
         else if(m_currentHeight < transform.position.y)
         {
@@ -44,9 +50,17 @@ public class BowlingBall : MonoBehaviour
         }
     }
 
-    void RollBall()
+    void EnablePhysics(bool state)
     {
-        m_currentHeight = transform.position.y;
+        m_col.enabled = state;
+        m_rb.useGravity = state;
+    }
+
+    public void RollBall(float power)
+    {
+        m_Power = power;
+        EnablePhysics(true);
+
         m_rb.AddForce(Vector3.forward * m_Speed * m_Power);
     }
 }

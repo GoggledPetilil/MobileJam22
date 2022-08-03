@@ -5,11 +5,11 @@ using UnityEngine;
 public class BowlingGame : MonoBehaviour
 {
     [SerializeField] private GameObject m_PinPrefab;
+    List<BowlingPin> m_AllPins = new List<BowlingPin>();
     public int m_TotalPins;
     public float verticalMod = 0.8f;
     public float horizontalMod = 1.25f;
     private float yPos;
-    //public float zOffset;
 
     public bool reset;
 
@@ -36,19 +36,18 @@ public class BowlingGame : MonoBehaviour
 
     void CreateFormation()
     {
-        List<Vector3> newpositions = new List<Vector3>();
+        
         
         int height = Mathf.CeilToInt((Mathf.Sqrt(8*m_TotalPins+1f)-1f)/2);
         int slots = (int)(height * (height+1f)/2f);
 
         float width = 0.5f * (height-1f);
         Vector3 startPos = new Vector3(0, yPos, 0);
-        //Vector3 startPos = new Vector3(width * horizontalMod, yPos, (float)(height-1f)*verticalMod);
 
         int finalRowCount = height - slots + m_TotalPins;
-        for(int rowNum = 0; rowNum < height && newpositions.Count < m_TotalPins; rowNum++)
+        for(int rowNum = 0; rowNum < height && m_AllPins.Count < m_TotalPins; rowNum++)
         {
-            for(int i = 0; i < rowNum+1 && newpositions.Count < m_TotalPins; i++)
+            for(int i = 0; i < rowNum+1 && m_AllPins.Count < m_TotalPins; i++)
             {
                 float xOffset = 0f;
                 if(rowNum+1 == height)
@@ -65,28 +64,23 @@ public class BowlingGame : MonoBehaviour
                 float zOffset = (float)rowNum * verticalMod;
 
                 Vector3 position = new Vector3(startPos.x + xOffset, yPos, startPos.z + zOffset);
-                newpositions.Add(position);
 
                 GameObject instance = Instantiate(m_PinPrefab);
                 instance.transform.position = position;
                 instance.transform.SetParent(this.transform);
+                m_AllPins.Add(instance.GetComponent<BowlingPin>());
             }
         }
-        
-        /*Vector3 targetPos = Vector3.left;
+    }
 
-        for(int i = 1; i <= rows; i++)
+    public void KillDeadPins()
+    {
+        foreach(BowlingPin pin in m_AllPins)
         {
-            for(int j = 0; j < i; j++)
+            if(pin.isKnockedOver())
             {
-                GameObject instance = Instantiate(m_PinPrefab);
-                targetPos = new Vector3(targetPos.x + xOffset, yPos, targetPos.z);
-                instance.transform.position = targetPos;
-                instance.transform.SetParent(this.transform);
+                pin.DestroySelf();
             }
-            // Offset the new row
-            targetPos = new Vector3((rowOffset * i) - xOffset/2, yPos, targetPos.z + zOffset);
-
-        }*/
+        }
     }
 }
