@@ -6,10 +6,12 @@ public class BowlingPin : MonoBehaviour
 {
     [Header("Parameters")]
     public bool m_beenHit;
-    [SerializeField] private Vector3 m_com;
+    public Vector3 m_com;
+    [SerializeField] private LayerMask m_GroundLayer;
 
     [Header("Components")]
     [SerializeField] private AudioSource m_audio;
+    [SerializeField] private AudioClip[] m_audioClips;
     [SerializeField] private Rigidbody m_rb;
 
     void Awake()
@@ -20,6 +22,16 @@ public class BowlingPin : MonoBehaviour
 
     void Start()
     {
+        m_rb.centerOfMass = m_com;
+        m_audio.clip = m_audioClips[Random.Range(0, m_audioClips.Length)];
+    }
+
+    void Update()
+    {
+        float rotX = Mathf.InverseLerp(0.0f, 180.0f, transform.rotation.eulerAngles.x);
+        float rotZ = Mathf.InverseLerp(0.0f, 180.0f, transform.rotation.eulerAngles.z);
+
+        m_com.y = Mathf.Max(rotX, rotZ);
         m_rb.centerOfMass = m_com;
     }
 
@@ -36,7 +48,7 @@ public class BowlingPin : MonoBehaviour
 
         Quaternion rot = transform.rotation;
 
-        float threshold = 64f;
+        float threshold = 45f;
 
         if(rot.eulerAngles.x >= threshold || rot.eulerAngles.x <= -threshold || rot.eulerAngles.z >= threshold || rot.eulerAngles.z <= -threshold)
         {
@@ -46,9 +58,21 @@ public class BowlingPin : MonoBehaviour
         return isKnockedOver;
     }
 
+    public bool isGrounded()
+    {
+        float distance = 1f;
+        return Physics.Raycast(transform.position, -Vector3.up, distance, m_GroundLayer);
+    }
+
     public void DestroySelf()
     {
         StartCoroutine("DestroyAnimation");
+    }
+
+    public void FreezeBody()
+    {
+        m_rb.constraints = RigidbodyConstraints.FreezeRotationX;
+        m_rb.constraints = RigidbodyConstraints.FreezeRotationZ;
     }
 
     void OnCollisionEnter(Collision collision)
@@ -58,7 +82,7 @@ public class BowlingPin : MonoBehaviour
             PlayHitSound();
 
             float force;
-            force = collision.gameObject.GetComponent<BowlingBall>().m_Power;
+            force = collision.gameObject.GetComponent<BowlingBall>().m_Power * 100;
             
             Vector3 dir = (this.transform.position - collision.gameObject.transform.position).normalized;
             m_rb.AddForce(dir * force, ForceMode.Impulse);

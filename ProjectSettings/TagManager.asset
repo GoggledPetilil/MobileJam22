@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - BowlingBall
+  - BowlingPin
   layers:
   - Default
   - TransparentFX
@@ -12,9 +13,9 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
+  - Player
+  - Ball
+  - Ground
   - 
   - 
   - 

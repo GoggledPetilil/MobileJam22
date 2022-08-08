@@ -1,15 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class BowlingGame : MonoBehaviour
 {
     [SerializeField] private GameObject m_PinPrefab;
     List<BowlingPin> m_AllPins = new List<BowlingPin>();
+    public GameObject m_Middle;
     public int m_TotalPins;
     public float verticalMod = 0.8f;
     public float horizontalMod = 1.25f;
     private float yPos;
+    [SerializeField] private TMP_Text m_ScoreText;
+    private int m_Score;
 
     public bool reset;
 
@@ -18,6 +22,9 @@ public class BowlingGame : MonoBehaviour
     {
         yPos = transform.position.y;
         CreateFormation();
+
+        m_Score = 0;
+        m_ScoreText.text = m_Score.ToString();
     }
 
     // Update is called once per frame
@@ -36,8 +43,6 @@ public class BowlingGame : MonoBehaviour
 
     void CreateFormation()
     {
-        
-        
         int height = Mathf.CeilToInt((Mathf.Sqrt(8*m_TotalPins+1f)-1f)/2);
         int slots = (int)(height * (height+1f)/2f);
 
@@ -71,16 +76,37 @@ public class BowlingGame : MonoBehaviour
                 m_AllPins.Add(instance.GetComponent<BowlingPin>());
             }
         }
+        m_Middle.transform.position = new Vector3(0.0f, 0.0f, height / 2f);
     }
 
     public void KillDeadPins()
     {
+        StartCoroutine("KillPins");
+    }
+
+    IEnumerator KillPins()
+    {
         foreach(BowlingPin pin in m_AllPins)
         {
-            if(pin.isKnockedOver())
+            if(pin.isGrounded())
             {
-                pin.DestroySelf();
+                pin.FreezeBody();
             }
+            if(pin.isKnockedOver() || pin.m_com.y > 0.8f || !pin.isGrounded())
+            {
+                //pin.DestroySelf();
+                m_Score++;
+            }
+        }
+
+        yield return null;
+        float t = 0.0f;
+        float dur = 2.0f;
+        while(t < 1.0f)
+        {
+            t += Time.deltaTime / dur;
+            m_ScoreText.text = Mathf.Lerp(0, m_Score, t).ToString("F0");
+            yield return null;
         }
     }
 }
