@@ -75,6 +75,13 @@ public class BowlingPin : MonoBehaviour
         m_rb.constraints = RigidbodyConstraints.FreezeRotationZ;
     }
 
+    public void ResetObject()
+    {
+        m_rb.velocity = Vector3.zero;
+        m_rb.constraints = RigidbodyConstraints.None;
+        transform.rotation = Quaternion.identity;
+    }
+
     void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.CompareTag("BowlingBall"))

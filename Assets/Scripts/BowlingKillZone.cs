@@ -21,9 +21,10 @@ public class BowlingKillZone : MonoBehaviour
     {
         if(other.gameObject.CompareTag("BowlingBall"))
         {
-            game.KillDeadPins();
-            this.gameObject.SetActive(false);
-            other.gameObject.SetActive(false);
+            Camera.main.GetComponent<BowlingCamera>().FocusOnField();
+            game.EndRound();
+            //this.gameObject.SetActive(false);
+            //other.gameObject.SetActive(false);
         }
     }
 }

@@ -11,8 +11,7 @@ public class BowlingCamera : MonoBehaviour
 
     void Start()
     {
-        m_TargetObj = GameObject.FindGameObjectWithTag("BowlingBall");
-        m_Offset = new Vector3(0.0f, 1.0f, -14.0f);
+        FocusOnPlayer();
     }
 
     void LateUpdate()
@@ -20,6 +19,12 @@ public class BowlingCamera : MonoBehaviour
         Vector3 endPos = m_TargetObj.transform.position + m_Offset;
         Vector3 smoothPos = Vector3.Lerp(this.transform.position, endPos, m_Speed * Time.deltaTime);
         this.transform.position = smoothPos;
+    }
+
+    public void FocusOnPlayer()
+    {
+        m_TargetObj = GameObject.FindGameObjectWithTag("BowlingBall");
+        m_Offset = new Vector3(0.0f, 1.0f, -14.0f);
     }
 
     public void FocusOnField()

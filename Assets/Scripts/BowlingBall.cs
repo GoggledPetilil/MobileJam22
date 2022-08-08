@@ -9,6 +9,8 @@ public class BowlingBall : MonoBehaviour
     public float m_Drift;
     public float m_Speed;
     public Vector3 m_MovDir;
+    private float m_MatAlpha = 0.2f;
+    public Vector3 m_startPos;
 
     [Header("Physics")]
     private float m_currentHeight;
@@ -23,6 +25,7 @@ public class BowlingBall : MonoBehaviour
     [Header("Components")]
     [SerializeField] private Rigidbody m_rb;
     [SerializeField] private Collider m_col;
+    [SerializeField] private Material m_Mat;
 
     void Awake()
     {
@@ -34,6 +37,12 @@ public class BowlingBall : MonoBehaviour
         m_currentHeight = transform.position.y;
         EnablePhysics(false);
         m_driftTime = 0.0f;
+
+        Color c = m_Mat.color;
+        c.a = m_MatAlpha;
+        m_Mat.color = c;
+
+        m_startPos = transform.localPosition;
     }
 
     void Update()
@@ -90,17 +99,44 @@ public class BowlingBall : MonoBehaviour
         // Drift causes the ball to drift slightly to the left(-1f) or right(1f).
         m_Power = (1f - Mathf.Abs(Mathf.Clamp(power, -0.9f, 1f)));
         m_Drift = Mathf.Clamp(drift, -1f, 1f);
+        StartCoroutine("BecomeVisible");
         EnablePhysics(true);
 
         m_MovDir = Vector3.forward;
     }
 
-    void OnCollisionEnter(Collision collision)
+    public void ResetState()
     {
-        if(collision.gameObject.CompareTag("BowlingPin") && m_HitPin == false)
+        EnablePhysics(false);
+        m_MovDir = Vector3.zero;
+        m_driftTime = 0.0f;
+        m_rb.velocity = Vector3.zero;
+        m_rb.angularVelocity = Vector3.zero; 
+        transform.rotation = Quaternion.identity;
+
+        Color c = m_Mat.color;
+        c.a = m_MatAlpha;
+        m_Mat.color = c;
+
+        m_currentHeight = 99.0f;
+        transform.localPosition = m_startPos;
+    }
+
+    IEnumerator BecomeVisible()
+    {
+        Color c = m_Mat.color;
+
+        float dur = 0.5f;
+        float t = 0.0f;
+        while(t < 1.0f)
         {
-            m_HitPin = true;
-            Camera.main.GetComponent<BowlingCamera>().FocusOnField();
+            t += Time.deltaTime / dur;
+            
+            c.a = Mathf.Lerp(m_MatAlpha, 1.0f, t);
+            m_Mat.color = c;
+
+            yield return null;
         }
+        yield return null;
     }
 }
