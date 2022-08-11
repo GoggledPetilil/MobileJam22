@@ -2294,6 +2294,7 @@ MonoBehaviour:
   m_Drift: 0
   m_Speed: 36
   m_MovDir: {x: 0, y: 0, z: 0}
+  m_startPos: {x: 0, y: 0, z: 0}
   m_currentDrift: 0
   m_LineOfSight: {fileID: 2010706479}
   m_rb: {fileID: 1793023601}
@@ -2442,6 +2443,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_PinPrefab: {fileID: 1455589204061897147, guid: 9c6deca928a39484eb5f1b33268a9d77, type: 3}
+  m_AllPins: []
+  m_AllPinPos: []
   m_Middle: {fileID: 419328544}
   m_TotalPins: 1000
   verticalMod: 1
